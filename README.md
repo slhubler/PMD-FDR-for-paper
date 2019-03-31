@@ -4,7 +4,7 @@ Current title of paper: Challenges in Peptide-Spectrum Matching: a Robust and Re
 
 ## Installation and running
 - Pull this project to a local directory
-- UnZip each of the data files, in the Data directory, into the Data directory (IMPORTANT)
+- UnZip each of the zip files found in the Data directory back into the Data directory (IMPORTANT)
 - Load the project in RStudio
 - Ensure that the stringr package is installed
 - Run all of the code in main.R
