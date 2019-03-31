@@ -2,19 +2,13 @@
 This is the code and datasets used in the paper to be submitted - 
 Current title of paper: Challenges in Peptide-Spectrum Matching: a Robust and Reproducible Statistical Framework for Removing Low-Accuracy, High-Scoring Hits 
 
-## Caveats
-While we hope that others will use this work, there are a few caveats:
+## Installation and running
+- Pull this project to a local directory
+- UnZip each of the data files, in the Data directory, into the Data directory (IMPORTANT)
+- Load the project in RStudio
+- Run all of the code in RStudio
 
-- This is (will be) part of a published work and should be considered copyrighted by Rhapsody Data LLC.
-- The only goal of this project is to satisfy reproducibility requirements for the figures in the paper.
-- A newer, refactored version is in the works that will allow others to more easily use and maintain code.
-- An offshoot of this newer software will be a module for Galaxy-P.
-- While some effort has been made to simplify the code, it was the result of scientific exploration; I have deliberately left some code that has been commented out that was part of the original exploration.  The primary purpose of this is to show how to add functionality to the existing structure.
-
-## Running this code:
-- Run main.r in RStudio
-
-Expected effects of running main.r:
+## Expected effects of running code
 - Software will load six files from the Data directory (2 data sets have two files and 2 data sets have 1 file)
 - Each data set will be processed
 - After each step of processing, a "verify" step occurs; this was a rudimentary debugging step, where information about the new component was sent to standard output and to the Plots tab. If everything went correctly then this code will run (although noisily).  If an error occurred the program will crash.  This was by design to avoid creating invalid data files. Ungraceful but effective.
@@ -28,3 +22,12 @@ Expected effects of running main.r:
 ## Code was run and tested using...
 - R version 3.5.1 (2018-07-02)
 - RStudio version 1.1.463
+
+## Caveats
+While we hope that others will use this work, there are a few caveats:
+
+- This is (will be) part of a published work and should be considered copyrighted by Rhapsody Data LLC.
+- The only goal of this project is to satisfy reproducibility requirements for the figures in the paper.
+- A newer, refactored version is in the works that will allow others to more easily use and maintain code.
+- An offshoot of this newer software will be a module for Galaxy-P.
+- While some effort has been made to simplify the code, it was the result of scientific exploration; I have deliberately left some code that has been commented out that was part of the original exploration.  The primary purpose of this is to show how to add functionality to the existing structure.
