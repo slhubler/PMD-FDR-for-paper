@@ -1,66 +1,30 @@
 ###############################################################################
 # main.R                                                                      #
 #                                                                             #
-# Project 020 - Create GitHub module for paper                                #
+# Project 019 - Convert 017 to Galaxy Module                                  #
 #                                                                             #
-# Description: Analyze data and produce figures for paper                     #
+# Description: Combine projects 017 and 016 to form a Galaxy module           #
 #                                                                             #
-# Started: 2019-02-28                                                         #
+# Started: 2019-02-12                                                         #
 #                                                                             #
-# Version: (1.1)                                                              #
+# Version: (1.0)                                                              #
 #                                                                             #
 ###############################################################################
-
-# NEW REQUIREMENTS
-#   - All analysis but be within the same directory and self-contained
-#   - Main should only contain what is necessary to run analysis
-#   - ... including all images used in paper
 
 ###############################################################################
 ####### Load libraries etc.
 ###############################################################################
-
-#source("016 - functions.R")
-#source("016 - Actual_Distributions.R")
 source("functions.R")
-
-#source(file.path("..","Project 004 - myRUnit",  "RCRUnit.R"))
-
-###############################################################################
-####### 2018-03-21 Create full analysis structure for PMD paper
-###############################################################################
+#source("data.R") # Loads list_of_collections
 
 ###############################################################################
-# Reprocess data
+# Display plots
 ###############################################################################
-
-# 
-# process_parameters = list(load_collection = "skip",
-#                           data            = "load",
-#                           clean_data      = "skip",
-#                           grouping        = "make",
-#                           densities       = "make",
-#                           fdr_approx      = "make",
-#                           i_fdr           = "make",
-#                           ci_results      = "skip",
-#                           one_percent_FDR = "skip",
-#                           save_collection = "save")
-# 
-# 
-# # 
-# # apply_process_to_all_collections(list_of_data_collections = list_of_data_collections,
-# #                                  process_parameters = process_parameters,
-# #                                  over_write = FALSE )
-# 
-# #result <- apply_process_to_one_collection(data_collection = data_collection_oral_737_NS_combined, process_parameters = process_parameters, over_write = TRUE)
-# create_full_data_collection_all(list_of_data_collections = list_of_data_collections, over_write = TRUE)
-
-###############################################################################
-####### Finalize plots
-###############################################################################
-
 plots_for_paper <- Plots_for_Paper$new()
-plots_for_paper$create_data_collections(list_of_data_collections=list_of_data_collections)
-#plots_for_paper$create_plots_for_paper(include_main = TRUE , finalize=FALSE)
-plots_for_paper$create_plots_for_paper(include_main = FALSE, finalize=TRUE)
+plots_for_paper$create_plots_for_paper(include_main = TRUE , finalize=FALSE)
+#plots_for_paper$create_plots_for_paper(include_main = FALSE, finalize=TRUE)
 
+###############################################################################
+# Goals
+###############################################################################
+# One or more Galaxy modules
