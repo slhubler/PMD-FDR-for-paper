@@ -21,8 +21,8 @@ source("functions.R")
 # Display plots
 ###############################################################################
 plots_for_paper <- Plots_for_Paper$new()
-plots_for_paper$create_plots_for_paper(include_main = TRUE , finalize=FALSE)
-#plots_for_paper$create_plots_for_paper(include_main = FALSE, finalize=TRUE)
+#plots_for_paper$create_plots_for_paper(include_main = TRUE , finalize=FALSE)
+plots_for_paper$create_plots_for_paper(include_main = FALSE, finalize=TRUE)
 
 ###############################################################################
 # Goals

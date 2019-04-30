@@ -25,14 +25,26 @@ MIN_GOOD_PEPTIDE_LENGTH <- 11
 #############################################################
 ####### General purpose functions
 #############################################################
+# Creates a more useful error report when file is not reasonable
+safe_file_exists <- function(file_path){ # Still not particularly useful in cases where it is a valid directory
+  tryCatch(
+    return(file.exists(file_path)),
+    error=function(e) {simpleError(sprintf("file path is not valid: '%s'", file_path))}
+  )
+}
 # My standard way of loading data into data.frames
 load_standard_df <- function(file_path=NULL){
-  if (file.exists(file_path)){
+  if (safe_file_exists(file_path)){
     data <- read.table(file = file_path, header = TRUE, sep = "\t", stringsAsFactors = FALSE, blank.lines.skip = TRUE)#, check.names = FALSE)
   } else {
     stop(sprintf("File path does not exist: '%s'", file_path))
   }
   return(data)
+}
+save_standard_df <- function(x=NULL, file_path=NULL){
+  if (file_path != ""){
+    write.table(x = x, file = file_path, quote = FALSE, sep = "\t", row.names = FALSE, col.names = TRUE)
+  }
 }
 rename_column <- function(df=NULL, name_before=NULL, name_after=NULL, suppressWarnings=FALSE){
   if (is.null(df)){
@@ -211,6 +223,7 @@ Data_Object_Info <- setRefClass("Data_Object_Info",
                                 ) )
 Data_Object_Info$methods(
   m_load_data = function(){
+    
     # Nothing to do - this is really a data class
   },
   file_path = function(){
@@ -345,6 +358,7 @@ Data_Object_Raw_1_Percent$methods(
     return(verified_element_of_list(parents, "info", "Data_Object_Raw_1_Percent$parents"))
   },
   m_load_data = function(){
+    
     info <- get_info()
     file_path <- info$file_path_1_percent_FDR()
     if (exists()){
@@ -352,14 +366,17 @@ Data_Object_Raw_1_Percent$methods(
     } # Note that failing to load is a valid state for this file, leading to not is_dirty. BUGBUG: this could lead to problems if a good file appears later
   },
   exists = function(){
+    
     info <- get_info()
-    file_name <- info$data_file_name_1_percent_FDR
+    file_name <- info$data_file_name_1_percent_FDR # Check file name not file file path
+    
+    
     if (length(file_name) == 0 ){ # variable not set
       result = FALSE
     } else if (file_name == ""){  # variable set to empty string
       result = FALSE
     } else {
-      result = file.exists(info$file_path_1_percent_FDR())
+      result = safe_file_exists(info$file_path_1_percent_FDR())
     }
     
     return(result)
@@ -374,6 +391,9 @@ Data_Object_Groupings <- setRefClass("Data_Object_Groupings",
 Data_Object_Groupings$methods(
   m_load_data = function(){
     make_data_groups <- function(data_original=NULL){
+      
+      # Functions supporting make_data_groups()
+      
       standardize_fields <- function(data=NULL){
         data_new <- data
         manage_decoy_column <- function(data=NULL){
@@ -410,9 +430,6 @@ Data_Object_Groupings$methods(
         
         return(data_new)
       }
-      
-      # Functions supporting make_data_groups()
-      
       add_grouped_variable <- function(data_groups = data_groups, field_name_to_group = NULL, vec.length.out = NULL, vec.tolerance = NULL, value_format = NULL){
         
         # Support functions for add_grouped_variable()
@@ -483,7 +500,7 @@ Data_Object_Groupings$methods(
         data_new <- data_groups
         df_group_def <- data.frame(stringsAsFactors = FALSE,
                                    list(pattern    = c(""     , "pfu_"      , "cRAP"),
-                                        group_name = c("human", "pyrococcus", "trash")))
+                                        group_name = c("human", "pyrococcus", "contaminant")))
         for (i in 1:nrow(df_group_def)){
           idx <- grepl(pattern = df_group_def$pattern[i],
                        x       = data_new$proteins)
@@ -749,8 +766,8 @@ Data_Object_Groupings$methods(
   get_raw_data = function(){
     return(verified_element_of_list(parents, "raw_data", "Data_Object_Groupings$parents"))
   },
-  set_raw_1_percent = function(raw_data){
-    parents[["raw_1_percent"]] <<- raw_data
+  set_raw_1_percent = function(raw_1_percent){
+    parents[["raw_1_percent"]] <<- raw_1_percent
   },
   get_raw_1_percent = function(){
     return(verified_element_of_list(parents, "raw_1_percent", "Data_Object_Groupings$parents"))
@@ -783,7 +800,6 @@ Data_Object_Individual_FDR$methods(
   },
   m_load_data = function(){
     add_FDR_to_data_groups <- function(data_groups=NULL, densities=NULL, alpha=NULL, field_value=NULL, field_decoy_group=NULL, set_decoy_to_1=FALSE){
-      
       # Support functions for add_FDR_to_data_groups()
       get_group_fdr <- function(group_stats = NULL, data_groups = NULL, densities=NULL){
         group_fdr <- apply(X = densities, MARGIN = 2, FUN = max)
@@ -1012,40 +1028,43 @@ Data_Processor <- setRefClass("Data_Processor",
 Data_Processor$methods(
   initialize = function(p_info=NULL){
     if (! is.null(p_info)){
-      info <<- p_info
-      
-      # This initialization defines all of the dependencies between the various components
-      
-      # raw_data
-      raw_data$set_info(info)
-      info$append_child(raw_data)
-      
-      # raw_1_percent
-      raw_1_percent$set_info(info)
-      info$append_child(raw_1_percent)
-      
-      # data_groups
-      data_groups$set_raw_data     (raw_data)
-      data_groups$set_raw_1_percent(raw_1_percent)
-      raw_data     $append_child(data_groups)
-      raw_1_percent$append_child(data_groups)
-      
-      # densities
-      densities  $set_data_groups(data_groups)
-      data_groups$append_child   (densities)
-      
-      # alpha
-      alpha    $set_densities(densities)
-      densities$append_child (alpha)
-      
-      # i_fdr
-      i_fdr$set_data_groups(data_groups)
-      i_fdr$set_densities  (densities)
-      i_fdr$set_alpha      (alpha)
-      data_groups  $append_child(i_fdr)
-      densities    $append_child(i_fdr)
-      alpha        $append_child(i_fdr)
+      set_info(p_info)
     }
+  },
+  set_info = function(p_info=NULL){
+    # This initialization defines all of the dependencies between the various components
+    
+    info <<- p_info
+    
+    # raw_data
+    raw_data$set_info(info)
+    info$append_child(raw_data)
+    
+    # raw_1_percent
+    raw_1_percent$set_info(info)
+    info$append_child(raw_1_percent)
+    
+    # data_groups
+    data_groups$set_raw_data     (raw_data)
+    data_groups$set_raw_1_percent(raw_1_percent)
+    raw_data     $append_child   (data_groups)
+    raw_1_percent$append_child   (data_groups)
+    
+    # densities
+    densities  $set_data_groups(data_groups)
+    data_groups$append_child   (densities)
+    
+    # alpha
+    alpha    $set_densities(densities)
+    densities$append_child (alpha)
+    
+    # i_fdr
+    i_fdr$set_data_groups(data_groups)
+    i_fdr$set_densities  (densities)
+    i_fdr$set_alpha      (alpha)
+    data_groups  $append_child(i_fdr)
+    densities    $append_child(i_fdr)
+    alpha        $append_child(i_fdr)
   }
 )
 
